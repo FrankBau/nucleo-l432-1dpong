@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ws2812b.h"
+#include "one_d_pong.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,19 +98,14 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  static uint8_t data[1*24+300] = {
-    14,7,7,7,7,7,7,7, // G
-    7,7,7,7,7,7,7,7, // R
-    7,7,7,7,7,7,7,7 // B
-    // remaining are 0 for reset pulse
-  };
-  HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)data, sizeof(data));
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  setup();
   while (1)
   {
+    loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -19,7 +19,13 @@
 #ifndef ADAFRUIT_NEOPIXEL_H
 #define ADAFRUIT_NEOPIXEL_H
 
-#if (ARDUINO >= 100)
+#ifdef STM32L432xx
+  #include "stm32l4xx_hal.h"
+  #include <cstdlib>
+  #include <cstring>
+  #include <cstdint>
+  #define millis() HAL_GetTick()
+#elif (ARDUINO >= 100)
  #include <Arduino.h>
 #else
  #include <WProgram.h>
@@ -46,7 +52,7 @@ class Adafruit_NeoPixel {
  public:
 
   // Constructor: number of LEDs, pin number, LED type
-  Adafruit_NeoPixel(uint16_t n, uint8_t p=6, uint8_t t=NEO_GRB + NEO_KHZ800);
+  Adafruit_NeoPixel(uint16_t n, uint8_t p=6, uint8_t t=NEO_GRB + NEO_KHZ800, uint32_t reset_pulse=300);
   ~Adafruit_NeoPixel();
 
   void
@@ -67,8 +73,6 @@ class Adafruit_NeoPixel {
     Color(uint8_t r, uint8_t g, uint8_t b);
   uint32_t
     getPixelColor(uint16_t n) const;
-  inline bool
-    canShow(void) { return (micros() - endTime) >= 50L; }
 
  private:
 
@@ -86,12 +90,9 @@ class Adafruit_NeoPixel {
     type;          // Pixel flags (400 vs 800 KHz, RGB vs GRB color)
   uint32_t
     endTime;       // Latch timing reference
-#ifdef __AVR__
-  const volatile uint8_t
-    *port;         // Output PORT register
-  uint8_t
-    pinMask;       // Output PORT bitmask
-#endif
+
+  uint8_t t0h = 7;
+  uint8_t t1h = 14;
 
 };
 

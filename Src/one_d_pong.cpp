@@ -16,17 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "one_d_pong.h"
 #include "Adafruit_NeoPixel.h"
 #include "notes.h"
+#include "stm32l4xx_hal_gpio.h"
 
 #define NELEM(x)		(sizeof(x) / sizeof((x)[0]))
 
-#define PIN_WSDATA		2		// LED data
-#define PIN_BUT_RS		3		// Right start/hit button
-#define PIN_BUT_RP		4		// Right power-up button
-#define PIN_BUT_LS		5		// Left start/hit button
-#define PIN_BUT_LP		6		// Left power-up button
-#define PIN_SOUND		9		// Buzzer output (PB1/OC1A)
+
+#define PIN_WSDATA		0		// LED data
+#define PIN_BUT_RS		1		// Right start/hit button
+#define PIN_BUT_RP		2		// Right power-up button
+#define PIN_BUT_LS		3		// Left start/hit button
+#define PIN_BUT_LP		4		// Left power-up button
+#define PIN_SOUND		5		// Buzzer output (PB1/OC1A)
+
+struct {GPIO_TypeDef *port; uint32_t pin;} pins[] = {
+	[PIN_WSDATA] = {GPIOA, GPIO_PIN_7},
+	[PIN_BUT_RS] = {GPIOB, GPIO_PIN_0},
+	[PIN_BUT_RP] = {GPIOA, GPIO_PIN_1},	// unused
+	[PIN_BUT_LS] = {GPIOB, GPIO_PIN_4},
+	[PIN_BUT_LP] = {GPIOA, GPIO_PIN_1}, 	// unused
+	[PIN_SOUND] = {GPIOA, GPIO_PIN_4},
+};
+
+static inline int digitalRead(uint32_t pin) {
+	return HAL_GPIO_ReadPin(pins[pin].port, pins[pin].pin);
+}
+
+static inline int digitalWrite(uint32_t pin, uint8_t value) {
+	HAL_GPIO_WritePin(pins[pin].port, pins[pin].pin, (GPIO_PinState)value);
+	return 0;
+}
+
 
 #define NPIXELS			60		// Number of pixels to handle
 
@@ -116,7 +139,7 @@ typedef struct __note_t {
 } note_t;
 
 /* Tone pitch table for 16MHz crystal */
-static const uint16_t tone_pitch[NTONE_PITCH] PROGMEM = {
+static const uint16_t tone_pitch[NTONE_PITCH] = {
 	61155, 57722, 54482, 51424, 48538, 45814, 43242, 40815, 38524, 36362 /* == 220Hz */, 34321, 32395,
 	30577, 28860, 27240, 25711, 24268, 22906, 21620, 20407, 19261, 18180 /* == 440Hz */, 17160, 16197,
 	15288, 14429, 13619, 12855, 12133, 11452, 10809, 10203,  9630,  9089 /* == 880Hz */,  8579,  8098,
@@ -124,7 +147,7 @@ static const uint16_t tone_pitch[NTONE_PITCH] PROGMEM = {
 	 3821,  3606,  3404,  3213,  3032,  2862,  2701,  2550,  2406,  2271,  2144,  2023,
 	 1910,
 };
-static const note_t tune_win[] PROGMEM = {
+static const note_t tune_win[] = {
 	{ NOTE_Gs6, DUR_1_16 },
 	{ NOTE_A6, DUR_1_16 },
 	{ NOTE_Gs6, DUR_1_16 },
@@ -214,13 +237,13 @@ static inline uint8_t do_timer(uint8_t tdiff, uint16_t *tmr, uint8_t ev)
  */
 static inline void set_tone(uint16_t note, uint16_t duration)
 {
-	tonetimer = duration;
-	if(note && note <= NTONE_PITCH) {
-		OCR1A = pgm_read_word(&tone_pitch[note-1]);
-		TCCR1A = _BV(COM1A0);	/* Set toggle output */
-		TCNT1 = 0;
-	} else
-		sound_off();
+	// tonetimer = duration;
+	// if(note && note <= NTONE_PITCH) {
+	// 	OCR1A = tone_pitch[note-1];
+	// 	TCCR1A = _BV(COM1A0);	/* Set toggle output */
+	// 	TCNT1 = 0;
+	// } else
+	// 	sound_off();
 }
 
 /*
@@ -229,8 +252,8 @@ static inline void set_tone(uint16_t note, uint16_t duration)
 static inline void tune_next()
 {
 	if(tuneidx < NELEM(tune_win)) {
-		uint16_t n = pgm_read_byte(&tune_win[tuneidx].note);
-		uint16_t d = pgm_read_word(&tune_win[tuneidx].duration);
+		uint16_t n = tune_win[tuneidx].note;
+		uint16_t d = tune_win[tuneidx].duration;
 		set_tone(n, d);
 		tuneidx++;
 	} else
@@ -586,14 +609,7 @@ static void set_state(uint8_t newstate)
  */
 void setup()
 {
-	PORTB = PORTC = PORTD = 0xff;	// Enable all pull-ups so we don't have undef inputs hanging
-
-	pinMode(PIN_BUT_LS, INPUT_PULLUP);
-	pinMode(PIN_BUT_RS, INPUT_PULLUP);
-	pinMode(PIN_BUT_LP, INPUT_PULLUP);
-	pinMode(PIN_BUT_RP, INPUT_PULLUP);
 	digitalWrite(PIN_SOUND, 0);
-	pinMode(PIN_SOUND, OUTPUT);
 
 	one_d.begin();		// Setup IO
 	one_d.show();		// All leds off
@@ -606,10 +622,10 @@ void setup()
 	 * in the pixel-update causes interference in the timing resulting in
 	 * clicks in the sound output.
 	 */
-	TCCR1A = 0;
-	TCCR1B = _BV(WGM12) | _BV(CS10);
-	OCR1A = NOTE_C4;	// Just a value
-	TCNT1 = 0;
+	// TCCR1A = 0;
+	// TCCR1B = _BV(WGM12) | _BV(CS10);
+	// OCR1A = NOTE_C4;	// Just a value
+	// TCNT1 = 0;
 }
 
 /*
