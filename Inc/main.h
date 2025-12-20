@@ -65,13 +65,7 @@ void Error_Handler(void);
 #define VCP_TX_GPIO_Port GPIOA
 #define PIN_SOUND_Pin GPIO_PIN_4
 #define PIN_SOUND_GPIO_Port GPIOA
-#define PIN_BUT_LS_Pin GPIO_PIN_5
-#define PIN_BUT_LS_GPIO_Port GPIOA
-#define GND_LS_Pin GPIO_PIN_7
-#define GND_LS_GPIO_Port GPIOA
-#define GND_RS_Pin GPIO_PIN_0
-#define GND_RS_GPIO_Port GPIOB
-#define PIN_WSDATA_Pin GPIO_PIN_8
+#define PIN_WSDATA_Pin GPIO_PIN_7
 #define PIN_WSDATA_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
@@ -81,8 +75,6 @@ void Error_Handler(void);
 #define VCP_RX_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_3
 #define LD3_GPIO_Port GPIOB
-#define PIN_BUT_RS_Pin GPIO_PIN_6
-#define PIN_BUT_RS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
