@@ -62,9 +62,7 @@ Adafruit_NeoPixel::~Adafruit_NeoPixel() {
 }
 
 void Adafruit_NeoPixel::begin(void) {
-  for(int i = 0; i < numLEDs; i++) {
-    setPixelColor(i, 0, 0, 0);
-  }
+  clear();
 }
 
 void Adafruit_NeoPixel::show(void) {
@@ -253,5 +251,8 @@ uint8_t Adafruit_NeoPixel::getBrightness(void) const {
 
 void Adafruit_NeoPixel::clear() {
   memset(pixels, 0, numBytes);
+  for(int i = 0; i < numLEDs; i++) {
+    setPixelColor(i, 0, 0, 0);
+  }
 }
 
