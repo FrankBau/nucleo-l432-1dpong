@@ -607,7 +607,7 @@ static void set_state(uint8_t newstate)
  */
 void setup()
 {
-	digitalWrite(PIN_SOUND, 0);
+	// digitalWrite(PIN_SOUND, 0);
 
 	one_d.begin();		// Setup IO
 	one_d.show();		// All leds off
