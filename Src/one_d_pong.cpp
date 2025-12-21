@@ -51,13 +51,13 @@ static inline int digitalWrite(uint32_t pin, uint8_t value) {
 }
 
 
-#define NPIXELS			60		// Number of pixels to handle
+#define NPIXELS			144		// Number of pixels to handle
 
-#define ZONE_SIZE		7		// Bounce-back zone size
+#define ZONE_SIZE		10		// Bounce-back zone size
 #define SHOW_LO			12		// Score dots intensity background
 #define SHOW_HI			48		// Score dots intensity foreground
 #define WIN_POINTS		10		// Points needed to win
-#define TONE_INTERVAL		5		// Not every ball move should give a sound
+#define TONE_INTERVAL	 5		// Not every ball move should give a sound
 
 Adafruit_NeoPixel one_d = Adafruit_NeoPixel(NPIXELS, PIN_WSDATA, NEO_GRB | NEO_KHZ800);
 
@@ -66,12 +66,12 @@ Adafruit_NeoPixel one_d = Adafruit_NeoPixel(NPIXELS, PIN_WSDATA, NEO_GRB | NEO_K
 #define EV_BUT_RS_PRESS		0x02
 #define EV_BUT_LP_PRESS		0x04
 #define EV_BUT_RP_PRESS		0x08
-#define EV_TIMER		0x10
-#define EV_TIMEOUT		0x20
+#define EV_TIMER			0x10
+#define EV_TIMEOUT			0x20
 #define EV_TONETIMER		0x40
 
 #define TIME_DEBOUNCE		8
-#define TIME_IDLE		40
+#define TIME_IDLE			40
 #define TIME_START_TIMEOUT	20000		// Go idle if nothing happens
 #define TIME_RESUME_TIMEOUT	7500		// Auto-fire after timeout
 #define TIME_BALL_BLINK		150
