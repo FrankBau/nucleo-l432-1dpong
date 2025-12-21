@@ -20,8 +20,9 @@
 #include "one_d_pong.h"
 #include "Adafruit_NeoPixel.h"
 #include "notes.h"
-
-#include <stdio.h>
+#include "stm32_hal_legacy.h"
+#include "stm32l432xx.h"
+#include "stm32l4xx_hal_tim.h"
 
 #define NELEM(x)		(sizeof(x) / sizeof((x)[0]))
 
@@ -172,8 +173,6 @@ static const note_t tune_win[] = {
 	{ NOTE_B3, DUR_1_4 },
 };
 
-#define sound_off()	do { TCCR1A = _BV(COM1A1); /* Set clear output */ } while(0)
-
 /*
  * Return the current state of a button.
  * Returns non-zero on button pressed.
@@ -238,13 +237,14 @@ static inline uint8_t do_timer(uint8_t tdiff, uint16_t *tmr, uint8_t ev)
  */
 static inline void set_tone(uint16_t note, uint16_t duration)
 {
-	// tonetimer = duration;
-	// if(note && note <= NTONE_PITCH) {
-	// 	OCR1A = tone_pitch[note-1];
-	// 	TCCR1A = _BV(COM1A0);	/* Set toggle output */
-	// 	TCNT1 = 0;
-	// } else
-	// 	sound_off();
+	extern TIM_HandleTypeDef htim15;
+	tonetimer = duration;
+	if(note && note <= NTONE_PITCH) {
+		TIM15->ARR = tone_pitch[note-1];
+		TIM15->CNT = 0;
+		TIM15->CR1 |= TIM_CR1_CEN;
+	} else
+		TIM15->CR1 &=~TIM_CR1_CEN;
 }
 
 /*
@@ -336,7 +336,6 @@ static void animate_idle(void)
 			int h = ai_h + i*360/NPIXELS;
 			h %= 360;
 			one_d.setPixelColorHsv(i, h, 255, 128);
-			printf("i=%d, h=%d\n", i, h);
 		}
 		ai_h += 60;
 		if(ai_h >= 360) {

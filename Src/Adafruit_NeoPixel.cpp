@@ -67,9 +67,8 @@ void Adafruit_NeoPixel::begin(void) {
 void Adafruit_NeoPixel::show(void) {
   if(!pixels) return;
   extern TIM_HandleTypeDef htim1;
-  while(
-    HAL_BUSY == HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pixels, numBytes)
-  );
+  HAL_Delay(1); // very loose
+  HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pixels, numBytes);
 }
 
 // Set the output pin number
