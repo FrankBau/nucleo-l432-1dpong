@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "one_d_pong.h"
+#include "stm32l4xx_hal_uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +62,13 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+int __io_putchar(int ch)
+{
+  while(!(USART2->ISR & USART_ISR_TXE));
+  USART2->TDR = ch;
+  return ch;
+}
 
 /* USER CODE END 0 */
 

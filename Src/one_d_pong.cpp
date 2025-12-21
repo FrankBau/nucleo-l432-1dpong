@@ -20,7 +20,8 @@
 #include "one_d_pong.h"
 #include "Adafruit_NeoPixel.h"
 #include "notes.h"
-#include "stm32l4xx_hal_gpio.h"
+
+#include <stdio.h>
 
 #define NELEM(x)		(sizeof(x) / sizeof((x)[0]))
 
@@ -323,8 +324,6 @@ static void animate_idle_init(void)
 	ai_state = 0;
 }
 
-#define H_STEPS	1542
-
 static void animate_idle(void)
 {
 	switch(ai_state) {
@@ -333,15 +332,15 @@ static void animate_idle(void)
 	case 2:
 	case 3:
 		/* Rainbow pattern */
-		for(uint8_t i = 0; i < NPIXELS; i++) {
-			uint16_t h = ai_h + (i << 4);
-			if(h >= H_STEPS)
-				h -= H_STEPS;
+		for(int i = 0; i < NPIXELS; i++) {
+			int h = ai_h + i*360/NPIXELS;
+			h %= 360;
 			one_d.setPixelColorHsv(i, h, 255, 128);
+			printf("i=%d, h=%d\n", i, h);
 		}
-		ai_h += H_STEPS/60;
-		if(ai_h >= H_STEPS) {
-			ai_h -= H_STEPS;
+		ai_h += 60;
+		if(ai_h >= 360) {
+			ai_h -= 360;
 			ai_pos = 0;
 			ai_state++;
 		}

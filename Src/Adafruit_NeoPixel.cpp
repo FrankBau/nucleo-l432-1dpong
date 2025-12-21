@@ -32,7 +32,6 @@
   -------------------------------------------------------------------------*/
 
 #include "Adafruit_NeoPixel.h"
-#include "stm32l4xx_hal_dma.h"
 
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t, uint32_t reset_pulse) :
    numLEDs(n), numBytes(n * 3 * 8 + reset_pulse), pin(p), brightness(0),
@@ -125,42 +124,45 @@ void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
 */
 static inline void hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g, uint8_t *b)
 {
-	uint16_t frac = h;
-
-	if(!s)
-		s++;	/* This fixes border case, marked !! below */
-	if(h < 257) {
-		frac -= 0;
-		*r = v;
-		*g = (v * (uint8_t)(~((s * (256-frac)) >> 8))) >> 8;
-		*b  = (v * (uint8_t)(~s + 1)) >> 8;
-	} else if(h < 514) {
-		frac -= 257;
-		*r = (v * (uint8_t)(~((s * frac) >> 8))) >> 8;
-		*g = v;
-		*b = (v * (uint8_t)(~s + 1)) >> 8;
-	} else if(h < 771) {
-		frac -= 514;
-		*r = (v * (uint8_t)(~s + 1)) >> 8;
-		*g = v;
-		*b = (v * (uint8_t)(~((s * (256-frac)) >> 8))) >> 8;
-	} else if(h < 1028) {
-		frac -= 771;
-		*r = (v * (uint8_t)(~s + 1)) >> 8;
-		*g = (v * (uint8_t)(~((s * frac) >> 8))) >> 8;
-		*b = v;
-	} else if(h < 1285) {
-		frac -= 1028;
-		*r = (v * (uint8_t)(~((s * (256-frac)) >> 8))) >> 8;
-		*g = (v * (uint8_t)(~s + 1)) >> 8;
-		*b = v;
-	} else {
-		frac -= 1285;
-		*r = v;
-		*g = (v * (uint8_t)(~s + 1)) >> 8;
-		*b = (v * (uint8_t)(~((s * frac) >> 8))) >> 8;
-	}
-}
+        int region = h / 60;         // region of the color circle
+        int m = (h % 60) * 255 / 60; // remainder in the region
+        uint8_t p = (v * (255 - s)) / 255;
+        uint8_t q = (v * (255 - ((s * m) / 255))) / 255;
+        uint8_t t = (v * (255 - ((s * (255 - m)) / 255))) / 255;
+        switch (region)
+        {
+        case 0:
+            *r = v;
+            *g = t;
+            *b = p;
+            break;
+        case 1:
+            *r = q;
+            *g = v;
+            *b = p;
+            break;
+        case 2:
+            *r = p;
+            *g = v;
+            *b = t;
+            break;
+        case 3:
+            *r = p;
+            *g = q;
+            *b = v;
+            break;
+        case 4:
+            *r = t;
+            *g = p;
+            *b = v;
+            break;
+        default:
+            *r = v;
+            *g = p;
+            *b = q;
+            break;
+        }    
+  }
 
 void Adafruit_NeoPixel::setPixelColorHsv(uint16_t n, uint16_t h, uint8_t s, uint8_t v) {
 	uint8_t r, g, b;
