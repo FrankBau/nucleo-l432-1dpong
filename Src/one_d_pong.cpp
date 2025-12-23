@@ -333,7 +333,7 @@ static void animate_idle(void)
 			h %= 360;
 			one_d.setPixelColorHsv(i, h, 255, 128);
 		}
-		ai_h += 60;
+		ai_h += 10;
 		if(ai_h >= 360) {
 			ai_h -= 360;
 			ai_pos = 0;

@@ -33,6 +33,7 @@
 
 #include "Adafruit_NeoPixel.h"
 
+
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t, uint32_t reset_pulse) :
    numLEDs(n), numBytes(3 + n * 3 * 8 + reset_pulse), pin(p), brightness(0),
    pixels(NULL), type(t), endTime(0)
@@ -64,11 +65,19 @@ void Adafruit_NeoPixel::begin(void) {
   clear();
 }
 
+volatile bool dma_finished;
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+  dma_finished = true;
+}
+
 void Adafruit_NeoPixel::show(void) {
   if(!pixels) return;
   extern TIM_HandleTypeDef htim1;
-  HAL_Delay(1); // very loose to let any previous DMA finish
+  dma_finished = false;
   HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pixels, numBytes);
+  while(!dma_finished); // wait for completion, else we saw flicker
 }
 
 // Set the output pin number
