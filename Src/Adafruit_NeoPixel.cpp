@@ -34,7 +34,7 @@
 #include "Adafruit_NeoPixel.h"
 
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t, uint32_t reset_pulse) :
-   numLEDs(n), numBytes(n * 3 * 8 + reset_pulse), pin(p), brightness(0),
+   numLEDs(n), numBytes(3 + n * 3 * 8 + reset_pulse), pin(p), brightness(0),
    pixels(NULL), type(t), endTime(0)
 {
   if((pixels = (uint8_t *)malloc(numBytes))) {
@@ -67,7 +67,7 @@ void Adafruit_NeoPixel::begin(void) {
 void Adafruit_NeoPixel::show(void) {
   if(!pixels) return;
   extern TIM_HandleTypeDef htim1;
-  HAL_Delay(1); // very loose
+  HAL_Delay(1); // very loose to let any previous DMA finish
   HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pixels, numBytes);
 }
 
@@ -84,7 +84,7 @@ void Adafruit_NeoPixel::setPixelColor(
       g = (g * brightness) >> 8;
       b = (b * brightness) >> 8;
     }
-    uint8_t *p = &pixels[n * 3 * 8];
+    uint8_t *p = &pixels[3 + n * 3 * 8];
     for(int i = 0; i < 8; i++) {
       p[rOffset + i] = (r & (1 << (7 - i))) ? t1h : t0h;
     }
@@ -111,13 +111,7 @@ void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
 ------------------------------------------------------------------------------
  HSV to RGB conversion
 ------------------------------------------------------------------------------
- H [0..1541]	angle 0 == 0deg, 1541 < 360deg
-		sextants: [0..256], [257..513], [514..770], [771..1027], [1028..1284], [1285..1541]
-	8-bit(+1) per sextant
-		~0.2335 degrees per count
-		This is the highest resolution possible with 8 bit target colors and is already
-		slightly higher than necessay (max resolution is ~6 * 256). However, using the
-		current setup makes calculation a lot easier by using 8-bit shifts.
+ H [0..359]	angle 0 == 0deg, 359 < 360deg
  S [0..255]
  V [0..255]
 */
