@@ -20,9 +20,6 @@
 #include "one_d_pong.h"
 #include "Adafruit_NeoPixel.h"
 #include "notes.h"
-#include "stm32_hal_legacy.h"
-#include "stm32l432xx.h"
-#include "stm32l4xx_hal_tim.h"
 
 #define NELEM(x)		(sizeof(x) / sizeof((x)[0]))
 
@@ -35,12 +32,12 @@
 #define PIN_SOUND		5		// Buzzer output
 
 struct {GPIO_TypeDef *port; uint32_t pin;} pins[] = {
-	[PIN_WSDATA] = {GPIOA, GPIO_PIN_7},
-	[PIN_BUT_RS] = {GPIOB, GPIO_PIN_0},
-	[PIN_BUT_RP] = {GPIOA, GPIO_PIN_1},	// unused
-	[PIN_BUT_LS] = {GPIOB, GPIO_PIN_4},
-	[PIN_BUT_LP] = {GPIOA, GPIO_PIN_1}, 	// unused
-	[PIN_SOUND] = {GPIOA, GPIO_PIN_4},
+	{GPIOA, GPIO_PIN_7},
+	{GPIOB, GPIO_PIN_0},
+	{GPIOA, GPIO_PIN_1},	// currently unused
+	{GPIOB, GPIO_PIN_4},
+	{GPIOA, GPIO_PIN_1}, // currently unused
+	{GPIOA, GPIO_PIN_4},
 };
 
 static inline int digitalRead(uint32_t pin) {
