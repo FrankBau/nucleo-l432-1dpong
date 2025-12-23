@@ -32,7 +32,7 @@
 #define PIN_BUT_RP		2		// Right power-up button
 #define PIN_BUT_LS		3		// Left start/hit button
 #define PIN_BUT_LP		4		// Left power-up button
-#define PIN_SOUND		5		// Buzzer output (PB1/OC1A)
+#define PIN_SOUND		5		// Buzzer output
 
 struct {GPIO_TypeDef *port; uint32_t pin;} pins[] = {
 	[PIN_WSDATA] = {GPIOA, GPIO_PIN_7},
@@ -237,7 +237,6 @@ static inline uint8_t do_timer(uint8_t tdiff, uint16_t *tmr, uint8_t ev)
  */
 static inline void set_tone(uint16_t note, uint16_t duration)
 {
-	extern TIM_HandleTypeDef htim15;
 	tonetimer = duration;
 	if(note && note <= NTONE_PITCH) {
 		TIM15->ARR = tone_pitch[note-1];

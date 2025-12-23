@@ -91,8 +91,8 @@ class Adafruit_NeoPixel {
   uint32_t
     endTime;       // Latch timing reference
 
-  uint8_t t0h = 7;
-  uint8_t t1h = 14;
+  uint8_t t0h = 350/50; // 50 ns per tick
+  uint8_t t1h = 700/50; // 50 ns per tick
 
 };
 
