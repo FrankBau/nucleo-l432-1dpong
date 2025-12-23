@@ -1,11 +1,11 @@
-tested on YUNBO WS2812B RGB 144 LED strip 
+Nucleo-L432KC driving WS2812B RGB 144 LED strip
+
+Adafruit_NeoPixel code and one_d_pong.ino
+taken from vargrearg.org, partly ported to STM32.
 
 PIN_BUT_LS: left button, input, pull-up
-GND_LS: convenience "GND" pin for PIN_BUT_LS
+GND_LS:     convenience "GND" pin for PIN_BUT_LS
 PIN_BUT_RS: right button, input, pull-up
-GND_RS: convenience "GND" pin for PIN_BUT_RS
-PIN_WSDATA: timer channel PWM output
-PIN_SOUND: sound output (timer OC toggle) 
 
 timer clock == 20 MHz == 50ns per tick
 ws2812b
